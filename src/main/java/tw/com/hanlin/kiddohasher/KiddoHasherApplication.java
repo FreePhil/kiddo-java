@@ -95,8 +95,15 @@ public class KiddoHasherApplication implements CommandLineRunner {
                             publication.getUrlPrefx(), hashedFilenameOnly, FilenameUtils.getExtension(mp3Name));
                     track.setUrl(url);
                     log.info("url of mp3 file: {}", url);
+
+                    cd.getTracks().add(track);
                 }
+
+                publication.getCds().add(cd);
             }
+
+            // output the json format of publication
+            //
         }
     }
 }
