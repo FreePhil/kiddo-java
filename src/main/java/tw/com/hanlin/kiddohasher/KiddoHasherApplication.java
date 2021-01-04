@@ -1,5 +1,7 @@
 package tw.com.hanlin.kiddohasher;
 
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -8,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.List;
@@ -86,7 +89,12 @@ public class KiddoHasherApplication implements CommandLineRunner {
                     Track track = new Track();
                     track.setTitle(mp3Name);
 
-                    log.info("mp3 filename hash: {}", sha1HashWorker.digest(filePath.getBytes()).toString());
+                    String filenameOnly = FilenameUtils.removeExtension(mp3Name);
+                    String hashedFilenameOnly = DigestUtils.sha1Hex(filenameOnly.getBytes(StandardCharsets.UTF_8));
+                    String url = String.format("%s%s.%s",
+                            publication.getUrlPrefx(), hashedFilenameOnly, FilenameUtils.getExtension(mp3Name));
+                    track.setUrl(url);
+                    log.info("url of mp3 file: {}", url);
                 }
             }
         }
