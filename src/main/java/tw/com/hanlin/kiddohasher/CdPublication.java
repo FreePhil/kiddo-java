@@ -16,6 +16,6 @@ public class CdPublication {
     private String volume;
     private String volumeImage;
     private String volumeImagePath;
-    private String urlPrefx = "https://kiddo-mp3.hle.com.tw/";
+    private String urlPrefix = "https://kiddo-mp3.hle.com.tw/";
     private List<Cd> cds = new ArrayList<>();
 }

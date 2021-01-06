@@ -4,6 +4,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,7 +22,10 @@ import java.util.stream.Collectors;
 @SpringBootApplication
 public class KiddoHasherApplication implements CommandLineRunner {
 
-    private static Logger log = LoggerFactory.getLogger(SpringBootApplication.class);
+    private final static Logger log = LoggerFactory.getLogger(KiddoHasherApplication.class);
+
+    @Autowired
+    ParserInterface parser;
 
     public static void main(String[] args) {
         log.info("starting the application");
@@ -67,7 +71,7 @@ public class KiddoHasherApplication implements CommandLineRunner {
             log.info("thumbnail image: {}", imagePath);
 
             publication.setVolumeImagePath(imagePath);
-            publication.setVolumeImage(publication.getUrlPrefx() + imageFilename);
+            publication.setVolumeImage(publication.getUrlPrefix() + imageFilename);
             publication.setVolume(directory);
 
             List<String> cds = Arrays.stream(Objects.requireNonNull(imageFileEnumerator.list(directoryFilter)))
@@ -92,16 +96,21 @@ public class KiddoHasherApplication implements CommandLineRunner {
                     String filenameOnly = FilenameUtils.removeExtension(mp3Name);
                     String hashedFilenameOnly = DigestUtils.sha1Hex(filenameOnly.getBytes(StandardCharsets.UTF_8));
                     String url = String.format("%s%s.%s",
-                            publication.getUrlPrefx(), hashedFilenameOnly, FilenameUtils.getExtension(mp3Name));
+                            publication.getUrlPrefix(), hashedFilenameOnly, FilenameUtils.getExtension(mp3Name));
                     track.setUrl(url);
-                    log.info("url of mp3 file: {}", url);
+
+                    int duration = 0;
+                    duration = parser.getAudioLength(new File(filePath));
+                    track.setDuration(String.format("%d", duration));
+
+                    log.info("url of mp3 file: {}, duration: {}", url, duration);
 
                     cd.getTracks().add(track);
                 }
 
+
                 publication.getCds().add(cd);
             }
-
             // output the json format of publication
             //
         }
